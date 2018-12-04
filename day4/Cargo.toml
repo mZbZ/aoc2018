@@ -1,0 +1,9 @@
+[package]
+name = "day4"
+version = "0.1.0"
+authors = ["proMario <mario.lucas@prosense.co.za>"]
+edition = "2018"
+
+[dependencies]
+chrono = "*"
+regex = "*"
