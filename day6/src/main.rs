@@ -1,5 +1,4 @@
 #![feature(nll)]
-#![feature(vec_remove_item)]
 
 use std::collections::HashMap;
 
