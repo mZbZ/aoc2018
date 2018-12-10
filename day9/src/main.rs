@@ -38,18 +38,15 @@ fn part1(input: &str) -> usize {
 
 fn shared(input: &str, factor: usize) -> usize {
     let re = Regex::new(r"^(\d+)[^\d]+(\d+).*$").unwrap();
-    let mut players;
-    if let Some(cap) = re.captures_iter(input).next() {
-        players = (1..=cap[1].parse::<usize>().unwrap())
-            .map(|_| 0)
-            .collect::<Vec<usize>>();
 
-        // println!("Playing game with {} players", players.len());
+    if let Some(cap) = re.captures_iter(input).next() {
+        let mut players = vec![0; cap[1].parse::<usize>().unwrap()];
 
         let last_marble = cap[2].parse::<usize>().unwrap() * factor;
         let mut board = VecDeque::with_capacity(last_marble);
+
         board.push_back(0);
-        // println!("Game ends with marble {}", last_marble);
+
         (1..=last_marble).for_each(|next_marble| {
             if next_marble % 23 != 0 {
                 board.rotate_ccw(1);
@@ -58,7 +55,7 @@ fn shared(input: &str, factor: usize) -> usize {
                 proc_23(&mut board, &mut players, next_marble)
             }
         });
-        return *players.iter().max().unwrap();
+        return players.into_iter().max().unwrap();
     }
     panic!("No capture!");
 }
