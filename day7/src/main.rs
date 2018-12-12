@@ -1,6 +1,3 @@
-#![feature(nll)]
-#![feature(vec_remove_item)]
-
 extern crate regex;
 
 use std::collections::HashMap;
@@ -26,17 +23,30 @@ Step F must be finished before step E can begin.";
 fn part2(input: &str, delay: u8, helpers: usize) -> usize {
     let mut nodes: HashMap<char, (Vec<char>, u8)> = HashMap::new();
     input.lines().for_each(|x| {
-        let new_char = x.chars().nth(5).unwrap();
-        let entry = nodes
-            .entry(new_char)
-            .or_insert((vec![], new_char as u8 - delay));
-        entry.0.push(x.chars().nth(36).unwrap());
+        let first_char = x.chars().nth(5).unwrap();
+        let second_char = x.chars().nth(36).unwrap();
+
+        let first = nodes
+            .entry(first_char)
+            .or_insert((vec![], first_char as u8 - delay));
+        first.0.push(second_char);
+
+        nodes
+            .entry(second_char)
+            .or_insert((vec![], second_char as u8 - delay));
     });
+    println!("{:?}", nodes);
 
     let base_nodes = find_first_node(&nodes);
-    let mut working_nodes = base_nodes.into_iter().take(helpers).collect();
-    let mut prosp_nodes = base_nodes.into_iter().skip(helpers).collect();
-    work(nodes, working_nodes, prosp_nodes, helpers)
+    let working_nodes = base_nodes.clone().into_iter().take(helpers).fold(
+        Vec::with_capacity(helpers),
+        |mut acc, x| {
+            acc.push(x);
+            acc
+        },
+    );
+    let prosp_nodes = base_nodes.into_iter().skip(helpers).collect();
+    work(nodes, working_nodes, prosp_nodes)
 }
 
 fn part1(input: &str) -> String {
@@ -66,52 +76,92 @@ fn work(
     mut nodes: HashMap<char, (Vec<char>, u8)>,
     mut working_nodes: Vec<char>,
     mut prosp_nodes: Vec<char>,
-    helpers: usize,
 ) -> usize {
     let mut time = 0;
     loop {
-        for working_node in working_nodes {
-            nodes.entry(working_node).and_modify(|c| c.1 -= 1);
-        }
-        if let Some(new_workers) =
-            find_next_workers(&mut nodes, &mut working_nodes, &mut prosp_nodes)
-        {
-            for new_worker in new_workers {
-                if working_nodes.len() < helpers {
-                    working_nodes.push(new_worker);
-                } else {
-                    prosp_nodes.push(new_worker);
-                }
+        println!(
+            "Time {:?} Working Nodes {:?}    Propective Nodes {:?}",
+            time, working_nodes, prosp_nodes
+        );
+        //Do work and remove working nodes if they are done
+        let mut indexes = vec![];
+        for (idx, working_node) in working_nodes.iter().enumerate() {
+            let worker = nodes.get_mut(working_node).unwrap();
+            worker.1 -= 1;
+            if worker.1 == 0 {
+                indexes.push(idx);
             }
-        } else {
+        }
+
+        indexes.iter().for_each(|x| {
+            working_nodes.swap_remove(*x);
+        });
+
+        // println!("Working Nodes after remove {:?}", working_nodes);
+
+        // find next working nodes
+        find_next_workers(&mut nodes, &working_nodes, &mut prosp_nodes);
+
+        // println!("Propective Nodes after find {:?}", prosp_nodes);
+
+        // Assign workers
+        for prosp_node in &prosp_nodes {
+            if working_nodes.capacity() > working_nodes.len() {
+                working_nodes.push(*prosp_node);
+            }
+        }
+
+        for working_node in &working_nodes {
+            if let Some(pos) = prosp_nodes.iter().position(|x| x == working_node) {
+                prosp_nodes.remove(pos);
+            }
+        }
+
+        time += 1;
+
+        if nodes.values().all(|x| x.1 == 0) {
             break;
         }
-        time += 1
     }
     time
 }
 
 fn find_next_workers(
     nodes: &mut HashMap<char, (Vec<char>, u8)>,
-    working_nodes: &mut Vec<char>,
+    working_nodes: &Vec<char>,
     prosp_nodes: &mut Vec<char>,
-) -> Option<Vec<char>> {
-    prosp_nodes.append(&mut nodes.get(&curr_char).unwrap_or(&(vec![], 0)).0.clone());
+) {
+    nodes
+        .iter()
+        // Not being worked on
+        .filter(|(y, _)| !working_nodes.contains(y))
+        // Not already done
+        .filter(|(_, (_, xx))| *xx > 0)
+        // All decendants are done
+        .filter(|(z, _)| {
+            nodes
+                .iter()
+                .inspect(|cc| {
+                    if **z == 'T' {
+                        println!("Node {:?}", cc)
+                    }
+                })
+                .filter(|(_, (aa, _))| aa.contains(&z))
+                .inspect(|cc| {
+                    if **z == 'T' {
+                        println!("{:?} Requires {:?}", z, cc)
+                    }
+                })
+                .all(|(_, (_, bb))| *bb == 0)
+        })
+        .for_each(|(next, _)| {
+            if !prosp_nodes.contains(next) {
+                println!("Found {:?} ", *next);
+                prosp_nodes.push(*next);
+            }
+        });
     prosp_nodes.sort_unstable();
     prosp_nodes.dedup();
-    let mut results = None;
-    for next_alpha in working_nodes {
-        if let Some(new_worker) = nodes
-            .values()
-            .find(|aa| aa.0.contains(&next_alpha) || aa.1 == 0)
-        {
-            if results.is_none() {
-                results = Some(vec![]);
-            }
-            results.unwrap().push(next_alpha.clone())
-        }
-    }
-    results
 }
 
 fn traverse(mut nodes: HashMap<char, (Vec<char>, bool)>, mut prosp_nodes: Vec<char>) -> String {
@@ -120,7 +170,8 @@ fn traverse(mut nodes: HashMap<char, (Vec<char>, bool)>, mut prosp_nodes: Vec<ch
     loop {
         result += curr_char.to_string().as_str();
         nodes.entry(curr_char).and_modify(|c| c.1 = true);
-        prosp_nodes.remove_item(&curr_char);
+        let pos = prosp_nodes.iter().position(|x| x == &curr_char).unwrap();
+        prosp_nodes.remove(pos);
         if let Some(next_char) = find_next(&mut nodes, &mut prosp_nodes, curr_char) {
             curr_char = next_char;
         } else {
