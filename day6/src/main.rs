@@ -1,5 +1,3 @@
-#![feature(nll)]
-
 use std::collections::HashMap;
 
 fn main() {

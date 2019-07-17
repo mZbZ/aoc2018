@@ -1,5 +1,4 @@
-#![feature(nll)]
-#![feature(vec_remove_item)]
+
 
 fn main() {
     let input = include_str!("../input");

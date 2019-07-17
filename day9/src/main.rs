@@ -1,4 +1,3 @@
-#![feature(nll)]
 
 extern crate elapsed;
 extern crate regex;

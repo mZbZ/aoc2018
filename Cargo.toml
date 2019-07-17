@@ -1,0 +1,55 @@
+[package]
+name = "aoc2018"
+version = "0.1.0"
+authors = ["proMario <mario.lucas@prosense.co.za>"]
+edition = "2018"
+
+[dependencies]
+regex = "*"
+chrono = "*"
+elapsed = "*"
+rayon = "*"
+
+[[bin]]
+name = "day1"
+path = "day1/src/main.rs"
+
+[[bin]]
+name = "day2"
+path = "day2/src/main.rs"
+
+[[bin]]
+name = "day3"
+path = "day3/src/main.rs"
+
+[[bin]]
+name = "day4"
+path = "day4/src/main.rs"
+
+[[bin]]
+name = "day5"
+path = "day5/src/main.rs"
+
+[[bin]]
+name = "day6"
+path = "day6/src/main.rs"
+
+[[bin]]
+name = "day7"
+path = "day7/src/main.rs"
+
+[[bin]]
+name = "day8"
+path = "day8/src/main.rs"
+
+[[bin]]
+name = "day9"
+path = "day9/src/main.rs"
+
+[[bin]]
+name = "day10"
+path = "day10/src/main.rs"
+
+[[bin]]
+name = "day11"
+path = "day11/src/main.rs"

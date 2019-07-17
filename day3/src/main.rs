@@ -1,5 +1,3 @@
-#![feature(nll)]
-
 extern crate regex;
 
 use regex::Regex;

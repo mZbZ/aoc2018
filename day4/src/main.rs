@@ -1,4 +1,3 @@
-#![feature(nll)]
 
 extern crate chrono;
 extern crate regex;

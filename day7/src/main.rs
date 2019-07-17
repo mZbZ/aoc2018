@@ -35,7 +35,7 @@ fn part2(input: &str, delay: u8, helpers: usize) -> usize {
             .entry(second_char)
             .or_insert((vec![], second_char as u8 - delay));
     });
-    println!("{:?}", nodes);
+    //println!("{:?}", nodes);
 
     let base_nodes = find_first_node(&nodes);
     let working_nodes = base_nodes.clone().into_iter().take(helpers).fold(
@@ -79,10 +79,10 @@ fn work(
 ) -> usize {
     let mut time = 0;
     loop {
-        println!(
-            "Time {:?} Working Nodes {:?}    Propective Nodes {:?}",
-            time, working_nodes, prosp_nodes
-        );
+        // println!(
+        //     "Time {:?} Working Nodes {:?}    Propective Nodes {:?}",
+        //     time, working_nodes, prosp_nodes
+        // );
         //Do work and remove working nodes if they are done
         let mut indexes = vec![];
         for (idx, working_node) in working_nodes.iter().enumerate() {
@@ -141,22 +141,22 @@ fn find_next_workers(
         .filter(|(z, _)| {
             nodes
                 .iter()
-                .inspect(|cc| {
+                .inspect(|_cc| {
                     if **z == 'T' {
-                        println!("Node {:?}", cc)
+                        // println!("Node {:?}", cc)
                     }
                 })
                 .filter(|(_, (aa, _))| aa.contains(&z))
-                .inspect(|cc| {
+                .inspect(|_cc| {
                     if **z == 'T' {
-                        println!("{:?} Requires {:?}", z, cc)
+                        // println!("{:?} Requires {:?}", z, cc)
                     }
                 })
                 .all(|(_, (_, bb))| *bb == 0)
         })
         .for_each(|(next, _)| {
             if !prosp_nodes.contains(next) {
-                println!("Found {:?} ", *next);
+                // println!("Found {:?} ", *next);
                 prosp_nodes.push(*next);
             }
         });
