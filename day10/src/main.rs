@@ -105,7 +105,7 @@ fn part1(input: &str, steps: usize, draw: usize) {
                             print!(".");
                         }
                     }
-                    println!("");
+                    println!();
                 }
             }
         }

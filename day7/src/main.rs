@@ -128,7 +128,7 @@ fn work(
 
 fn find_next_workers(
     nodes: &mut HashMap<char, (Vec<char>, u8)>,
-    working_nodes: &Vec<char>,
+    working_nodes: &[char],
     prosp_nodes: &mut Vec<char>,
 ) {
     nodes

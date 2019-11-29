@@ -1,4 +1,3 @@
-
 extern crate chrono;
 extern crate regex;
 
@@ -55,7 +54,7 @@ fn part2(input: &str) -> u32 {
             GuardState::Starting(x) => id_key = x,
             GuardState::Asleep => asleep_start = rec.date.minute(),
             GuardState::Awake => {
-                let id_rec = id_records.entry(id_key).or_insert(HashMap::new());
+                let id_rec = id_records.entry(id_key).or_insert_with(HashMap::new);
                 for asleep_mins in asleep_start..rec.date.minute() {
                     let min_rec = id_rec.entry(asleep_mins).or_insert(0);
                     *min_rec += 1;
@@ -63,22 +62,18 @@ fn part2(input: &str) -> u32 {
             }
         }
     }
-	
-	
-	let mut cur_max = 0;
-	let mut min_max = 0;
-	let mut id_max = 0;
-	for (id,mins) in id_records {
-		let max = mins.into_iter().max_by_key(|x| x.1).unwrap().clone();
-		if max.1 > cur_max {
-			id_max = id;
-			min_max = max.0;
-			cur_max = max.1;
-		}
-		
-	}
-    
 
+    let mut cur_max = 0;
+    let mut min_max = 0;
+    let mut id_max = 0;
+    for (id, mins) in id_records {
+        let max = mins.into_iter().max_by_key(|x| x.1).unwrap();
+        if max.1 > cur_max {
+            id_max = id;
+            min_max = max.0;
+            cur_max = max.1;
+        }
+    }
     //let elapsed = now.elapsed();
     //let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
     //println!("Seconds: {}", sec);
@@ -156,7 +151,7 @@ fn part1(input: &str) -> u32 {
             GuardState::Starting(x) => id_key = x,
             GuardState::Asleep => asleep_start = rec.date.minute(),
             GuardState::Awake => {
-                let id_rec = id_records.entry(id_key).or_insert(HashMap::new());
+                let id_rec = id_records.entry(id_key).or_insert_with(HashMap::new);
                 for asleep_mins in asleep_start..rec.date.minute() {
                     let min_rec = id_rec.entry(asleep_mins).or_insert(0);
                     *min_rec += 1;
@@ -164,24 +159,21 @@ fn part1(input: &str) -> u32 {
             }
         }
     }
-	
-	
-	let mut cur_total = 0;
-	let mut min_max = (0u32,0);
-	let mut id_max = 0;
-	for (id,mins) in id_records {
-		let mut total = 0; 
-		for (_,count) in &mins {
-			total += count;
-		}
-		if total > cur_total {
-			min_max = mins.into_iter().max_by_key(|x| x.1).unwrap().clone();
-			id_max = id;
-			cur_total = total;
-		}
-		
-	}
-    
+
+    let mut cur_total = 0;
+    let mut min_max = (0u32, 0);
+    let mut id_max = 0;
+    for (id, mins) in id_records {
+        let mut total = 0;
+        for count in mins.values() {
+            total += count;
+        }
+        if total > cur_total {
+            min_max = mins.into_iter().max_by_key(|x| x.1).unwrap();
+            id_max = id;
+            cur_total = total;
+        }
+    }
 
     //let elapsed = now.elapsed();
     //let sec = (elapsed.as_secs() as f64) + (elapsed.subsec_nanos() as f64 / 1000_000_000.0);
